@@ -1,6 +1,7 @@
-from ultralytics import YOLO
+from ultralytics import YOLO, checks, hub
+checks()
 
-# Load a COCO-pretrained YOLO11n model
-model = YOLO("yolo11n.pt")
+hub.login('d5dacce67251559e250de7affd15dae6cbb4b5c798')
 
-results = model.train(data="../../../data.yaml", epochs=10, imgsz=3801)
+model = YOLO('https://hub.ultralytics.com/models/8tWAXmazcyxdq0eTy5nt')
+results = model.train(amp=False)

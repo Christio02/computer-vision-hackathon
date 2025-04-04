@@ -63,13 +63,13 @@ product_code_to_class = {
 }
 # Define your original data path and new (global) data path
 data_path = Path("../../../data/images/NGD_HACK")
-new_data_path = Path("../../../new_data/YOLO_format")
+new_data_path = Path("../../../dataset/")
 
 # Create the global directories:
-global_img_train_dir = new_data_path / "images" / "train"
-global_img_val_dir   = new_data_path / "images" / "val"
-global_labels_train_dir = new_data_path / "labels" / "train"
-global_labels_val_dir   = new_data_path / "labels" / "val"
+global_img_train_dir = new_data_path / "train" / "images"
+global_img_val_dir   = new_data_path / "val" / "images"
+global_labels_train_dir = new_data_path / "train" / "labels"
+global_labels_val_dir   = new_data_path / "val" / "labels"
 
 for d in [global_img_train_dir, global_img_val_dir, global_labels_train_dir, global_labels_val_dir]:
     d.mkdir(parents=True, exist_ok=True)
@@ -166,8 +166,8 @@ def process_label_files(directory: Path):
             print(f"Failed to process {txt_file}: {e}")
 
 # Define your train and validation directories
-train_dir = Path("../../../new_data/YOLO_format/labels/train")
-val_dir = Path("../../../new_data/YOLO_format/labels/val")
+train_dir = Path("../../../dataset/train/labels")
+val_dir = Path("../../../dataset/val/labels")
 
 # Process both directories
 process_label_files(train_dir)

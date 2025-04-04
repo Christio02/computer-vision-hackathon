@@ -1,0 +1,34 @@
+﻿# YOLOv11 Hyperparameters (for 600-epoch training)
+# Optimizer, augmentation, and learning rate scheduler settings
+
+# Basic Parameters
+lr0: 0.01           # Initial learning rate (SGD 0.01, Adam 0.001)
+lrf: 0.01           # Final learning rate (lr0 * lrf)
+momentum: 0.937     # SGD momentum
+weight_decay: 0.0005  # Optimizer weight decay
+warmup_epochs: 3.0  # Warmup epochs
+warmup_momentum: 0.8
+warmup_bias_lr: 0.1
+
+# Loss Component Gains
+box: 0.05           # Box loss gain
+cls: 0.5            # Class loss gain
+cls_pw: 1.0         # Class positive weight
+obj: 1.0            # Objectness loss gain
+obj_pw: 1.0         # Objectness positive weight
+fl_gamma: 0.0       # Focal loss gamma (0.0 = disabled)
+
+# Augmentation Parameters
+hsv_h: 0.02     # Hue variation (slight color shifts)
+hsv_s: 0.5      # Saturation (mimics lighting changes)
+hsv_v: 0.4      # Brightness (shadows/overexposure))
+degrees: 15.0    # Rotation (fruits can be at any angle)
+translate: 0.1      # Image translation (+/- fraction)
+scale: 0.2          # Image scale (+/- gain)
+shear: 5.0       # Perspective (angled views)
+perspective: 0.0    # Image perspective (0.0-0.001)
+flipud: 0.0         # Image flip up-down (probability)
+fliplr: 0.5         # Image flip left-right (probability)
+mosaic: 1.0         # Use 1.0 to enable, 0.0 to disable
+mixup: 0.0          # Mixup (0.0-1.0, 0.0 = disabled)
+copy_paste: 0.0     # Copy-paste (0.0-1.0, 0.0 = disabled)

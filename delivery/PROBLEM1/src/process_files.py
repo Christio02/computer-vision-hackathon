@@ -1,4 +1,5 @@
-﻿import os
+﻿import json
+import os
 from pathlib import Path
 import random
 import shutil
@@ -31,44 +32,42 @@ plu_mapping = {
     '7071688004713': 'Original Havsalt 190g Sørlandschips',
     '7622210410337': 'Kvikk Lunsj 3x47g Freia'
 }
-
-# Define your paths as pathlib.Path objects
+# Define your original data path and new (global) data path
 data_path = Path("../../../data/images/NGD_HACK")
 new_data_path = Path("../../../new_data/YOLO_format")
-new_data_path.mkdir(parents=True, exist_ok=True)
 
-def copy_files(files, img_dest, label_dest, orig_prod_dir):
+# Create the global directories:
+global_img_train_dir = new_data_path / "images" / "train"
+global_img_val_dir   = new_data_path / "images" / "val"
+global_labels_train_dir = new_data_path / "labels" / "train"
+global_labels_val_dir   = new_data_path / "labels" / "val"
+
+for d in [global_img_train_dir, global_img_val_dir, global_labels_train_dir, global_labels_val_dir]:
+    d.mkdir(parents=True, exist_ok=True)
+
+def copy_files_global(files, img_dest, label_dest, orig_prod_dir, product_code):
     for filename in files:
+        # Optionally, prefix the filename with the product code if not already included.
+        new_filename = f"{product_code}_{filename}" if not filename.startswith(product_code) else filename
+
         src_image = orig_prod_dir / filename
-        dest_image = img_dest / filename
+        dest_image = img_dest / new_filename
         shutil.copy(src_image, dest_image)
 
         base_name = filename.rsplit(".", 1)[0]
+        new_base_name = f"{product_code}_{base_name}" if not base_name.startswith(product_code) else base_name
         annot_file = base_name + ".txt"
+        new_annot_file = new_base_name + ".txt"
         src_label = orig_prod_dir / annot_file
         if src_label.exists():
-            dest_label = label_dest / annot_file
+            dest_label = label_dest / new_annot_file
             shutil.copy(src_label, dest_label)
         else:
             print(f"Annotation file not found for {filename}")
 
-def process_folder(mapping):
+def process_folder_global(mapping):
     for product_code, product_name in mapping.items():
-        folder_name = product_name.lower().replace(" ", "-")
-        new_product_dir = new_data_path / folder_name
-        img_train_dir = new_product_dir / "images" / "train"
-        img_val_dir = new_product_dir / "images" / "val"
-        labels_train_dir = new_product_dir / "labels" / "train"
-        labels_val_dir = new_product_dir / "labels" / "val"
-
-        # Create directories for train and validation splits
-        img_train_dir.mkdir(parents=True, exist_ok=True)
-        img_val_dir.mkdir(parents=True, exist_ok=True)
-        labels_train_dir.mkdir(parents=True, exist_ok=True)
-        labels_val_dir.mkdir(parents=True, exist_ok=True)
-
         print("Processing product:", product_code, product_name)
-        # Print absolute path of the original directory for debugging
         orig_prod_dir = data_path / product_code
         print("Looking for original directory:", orig_prod_dir.resolve())
 
@@ -76,7 +75,7 @@ def process_folder(mapping):
             print("Original path does not exist:", orig_prod_dir)
             continue
 
-        # Get all image files (ignore visualization files ending with "_bb.png")
+        # Get all image files (ignoring visualization files ending with "_bb.png")
         image_files = [f for f in os.listdir(orig_prod_dir)
                        if f.endswith(".png") and not f.endswith("bb.png")]
         random.shuffle(image_files)
@@ -86,14 +85,65 @@ def process_folder(mapping):
         train_files = image_files[:split_idx]
         val_files = image_files[split_idx:]
 
-        copy_files(train_files, img_train_dir, labels_train_dir, orig_prod_dir)
-        copy_files(val_files, img_val_dir, labels_val_dir, orig_prod_dir)
+        copy_files_global(train_files, global_img_train_dir, global_labels_train_dir, orig_prod_dir, product_code)
+        copy_files_global(val_files, global_img_val_dir, global_labels_val_dir, orig_prod_dir, product_code)
 
-process_folder(plu_mapping)
+#process_folder_global(plu_mapping)
+print("Dataset reconstruction complete")
+
+def convert_json_annotation(json_file: Path)-> list:
+    with json_file.open("r", encoding="utf-8") as f:
+        data = json.load(f)
+    img_details = data["image_details"][0]
+
+    img_width = int(img_details["width"].replace("px", ""))
+    img_height = int(img_details["height"].replace("px", ""))
+
+    print(f"Image width: {img_width}")
+    print(f"Image height: {img_height}")
 
 
-def convert_json_annotation(path):
+    yolo_lines=[]
+    for obj in data["label"]:
+        product_code = obj["label"]
+
+        topX = obj["topX"]
+        topY = obj["topY"]
+        bottomX = obj["bottomX"]
+        bottomY = obj["bottomY"]
+        x_center = (topX + bottomX) / 2.0
+        y_center = (topY + bottomY) / 2.0
+        bbox_width = bottomX - topX
+        bbox_height = bottomY - topY
+
+        line = f"{product_code} {x_center:.6f} {y_center:.6f} {bbox_width:.6f} {bbox_height:.6f}"
+        yolo_lines.append(line)
+    return yolo_lines
 
 
+
+    # Example usage:
+    # Assuming you have an annotation file "4011-42.txt" in your working directory
+annotation_path = Path("../../../new_data/YOLO_format/labels")
+
+def process_label_files(directory: Path):
+    for txt_file in directory.glob("*.txt"):
+        print("Processing file:", txt_file)
+        try:
+            yolo_lines = convert_json_annotation(txt_file)
+            # Overwrite the file with the new YOLO formatted annotation
+            with txt_file.open("w", encoding="utf-8") as f:
+                f.write("\n".join(yolo_lines))
+            print("File updated:", txt_file)
+        except Exception as e:
+            print(f"Failed to process {txt_file}: {e}")
+
+# Define your train and validation directories
+train_dir = Path("../../../new_data/YOLO_format/labels/train")
+val_dir = Path("../../../new_data/YOLO_format/labels/val")
+
+# Process both directories
+process_label_files(train_dir)
+process_label_files(val_dir)
 
 print("Dataset reconstruction complete")

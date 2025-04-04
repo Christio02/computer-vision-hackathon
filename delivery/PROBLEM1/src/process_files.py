@@ -32,6 +32,35 @@ plu_mapping = {
     '7071688004713': 'Original Havsalt 190g Sørlandschips',
     '7622210410337': 'Kvikk Lunsj 3x47g Freia'
 }
+
+product_code_to_class = {
+    '4011': 0,
+    '4015': 1,
+    '4088': 2,
+    '4196': 3,
+    '94011': 4,
+    '90433917': 5,
+    '90433924': 6,
+    '7020097009819': 7,
+    '7020097026113': 8,
+    '7023026089401': 9,
+    '7035620058776': 10,
+    '7037203626563': 11,
+    '7037206100022': 12,
+    '7038010009457': 13,
+    '7038010013966': 14,
+    '7038010021145': 15,
+    '7038010054488': 16,
+    '7038010068980': 17,
+    '7039610000318': 18,
+    '7040513000022': 19,
+    '7040513001753': 20,
+    '7040913336684': 21,
+    '7044610874661': 22,
+    '7048840205868': 23,
+    '7071688004713': 24,
+    '7622210410337': 25,
+}
 # Define your original data path and new (global) data path
 data_path = Path("../../../data/images/NGD_HACK")
 new_data_path = Path("../../../new_data/YOLO_format")
@@ -88,7 +117,7 @@ def process_folder_global(mapping):
         copy_files_global(train_files, global_img_train_dir, global_labels_train_dir, orig_prod_dir, product_code)
         copy_files_global(val_files, global_img_val_dir, global_labels_val_dir, orig_prod_dir, product_code)
 
-#process_folder_global(plu_mapping)
+process_folder_global(plu_mapping)
 print("Dataset reconstruction complete")
 
 def convert_json_annotation(json_file: Path)-> list:
@@ -107,6 +136,8 @@ def convert_json_annotation(json_file: Path)-> list:
     for obj in data["label"]:
         product_code = obj["label"]
 
+        res = [val for key, val in product_code_to_class.items() if product_code == key]
+
         topX = obj["topX"]
         topY = obj["topY"]
         bottomX = obj["bottomX"]
@@ -116,15 +147,11 @@ def convert_json_annotation(json_file: Path)-> list:
         bbox_width = bottomX - topX
         bbox_height = bottomY - topY
 
-        line = f"{product_code} {x_center:.6f} {y_center:.6f} {bbox_width:.6f} {bbox_height:.6f}"
+        line = f"{res[0]} {x_center:.6f} {y_center:.6f} {bbox_width:.6f} {bbox_height:.6f}"
         yolo_lines.append(line)
     return yolo_lines
 
 
-
-    # Example usage:
-    # Assuming you have an annotation file "4011-42.txt" in your working directory
-annotation_path = Path("../../../new_data/YOLO_format/labels")
 
 def process_label_files(directory: Path):
     for txt_file in directory.glob("*.txt"):

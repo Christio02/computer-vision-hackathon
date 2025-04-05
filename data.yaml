@@ -1,0 +1,30 @@
+﻿train: images/train
+val: images/val
+
+names:
+  0: Bananer Bama
+  1: Epler Røde
+  2: Paprika Rød
+  3: Appelsin
+  4: Bananer Økologisk
+  5: Red Bull Regular 250ml boks
+  6: Red Bull Sukkerfri 250ml boks
+  7: Karbonadedeig 5% u/Salt og Vann 400g Meny
+  8: Kjøttdeig Angus 14% 400g Meny
+  9: Ruccula 65g Grønn&Frisk
+  10: Rundstykker Grove Fullkorn m/Frø Rustikk 6stk 420g
+  11: Leverpostei Ovnsbakt Orginal 190g Gilde
+  12: Kokt Skinke Ekte 110g Gilde
+  13: Yoghurt Skogsbær 4x150g Tine
+  14: Norvegia 26% skivet 150g Tine
+  15: Jarlsberg 27% skivet 120g Tine
+  16: Cottage Cheese Mager 2% 400g Tine
+  17: Yt Protein Yoghurt Vanilje 430g Tine
+  18: Frokostegg Frittgående L 12stk Prior
+  19: Gulrot 750g Beger
+  20: Gulrot 1kg pose First Price
+  21: Evergood Classic Filtermalt 250g
+  22: Pepsi Max 0,5l flaske
+  23: Frokostyoghurt Skogsbær 125g pose Q
+  24: Original Havsalt 190g Sørlandschips
+  25: Kvikk Lunsj 3x47g Freia

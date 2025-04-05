@@ -1,7 +1,29 @@
 ﻿## Overview
 This project aims to develop a computer vision model capable of accurately classifying grocery products based on images.
 
+## How to run PROBLEM1 (kind of solved)
 
+Go to terminal and use the following command:
+
+```
+cd delivery/PROBLEM1
+```
+
+And then run:
+```
+python main.py --val_dir ../val_dir
+python main.py --val_dir ../val_dir
+
+```
+One example could be:
+```
+python main.py --val_dir ../bilder
+```
+## Problem 2 is not solved, but... 
+there is a cool frontend solution where you can take pictures with "analyze frame", and then you would get printed out identified item in the conosle
+
+
+## Rest is just general information about repository
 ### Approach
 Model Choice:
 We use Ultralytics YOLO (v11n) for object detection. The model is fine-tuned (or used directly) to distinguish between 26 different product categories. We leverage a pretrained YOLO model from the Ultralytics hub and fine-tune it with our dataset.

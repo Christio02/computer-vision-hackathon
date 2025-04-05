@@ -8,12 +8,13 @@ from PIL import Image
 
 app = FastAPI()
 
-model_path =""
-model = YOLO("")
+model_path = "../model/best.pt"
+model = YOLO(model_path, task="detect")
 labels = model.names
 
 @app.post("/detect")
 async def detect(file: UploadFile = File(...)):
+    print("Received a detection request")
     contents = await file.read()
     nparr = np.frombuffer(contents, np.uint8)
     frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
@@ -32,5 +33,5 @@ async def detect(file: UploadFile = File(...)):
             "confidence": conf,
             "bbox": xyxy,
         })
-
+    print("detections", detected_items)
     return JSONResponse(content={"detections": detected_items})

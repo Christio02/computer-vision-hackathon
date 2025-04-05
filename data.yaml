@@ -1,5 +1,5 @@
-﻿train: new_data/YOLO_format/images/train
-val: new_data/YOLO_format/images/val
+﻿train: images/train
+val: images/val
 
 names:
   0: Bananer Bama
